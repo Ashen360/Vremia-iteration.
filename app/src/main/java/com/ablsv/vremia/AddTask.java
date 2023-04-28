@@ -29,8 +29,9 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, View.OnClickListener {
 
 
-    EditText taskNameInput, descInput;
-    TextView datepick, timepick, colorpick, colorprev;
+    private EditText taskName, taskDesc, taskIcon;
+    private DatabaseHelper databaseHelper;
+    private TextView datepick, timepick, colorpick, colorprev;
     int DefColor;
     ImageView imageToUpload;
     Button bSaveTask;
@@ -43,11 +44,14 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        DefColor = ContextCompat.getColor(AddTask.this, R.color.white);
-        ImageView cancelbtn = findViewById(R.id.cancel);
+        taskName = findViewById(R.id.taskNameInput);
+        taskDesc = findViewById(R.id.descInput);
         colorpick = findViewById(R.id.colorpick);
         datepick = findViewById(R.id.datepick);
         timepick = findViewById(R.id.timepick);
+        taskIcon = findViewById(R.id.imageToUpload);
+        DefColor = ContextCompat.getColor(AddTask.this, R.color.white);
+        ImageView cancelbtn = findViewById(R.id.cancel);
         Button taskBtn = findViewById(R.id.bSaveTask);
 
         colorpick.setOnClickListener(new View.OnClickListener() {
@@ -76,29 +80,6 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
             }
         });
 
-        EditText Name_input, Desc_input;
-        TextView Date_input, Time_input, Color_input;
-        ImageView Image_input;
-        Name_input = findViewById(R.id.taskNameInput);
-        Desc_input = findViewById(R.id.descInput);
-        Date_input = findViewById(R.id.datepick);
-        Time_input = findViewById(R.id.timepick);
-        Color_input = findViewById(R.id.colorpick);
-        Image_input = findViewById(R.id.imageToUpload);
-
-        taskBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DatabaseHelper Db = new DatabaseHelper(AddTask.this);
-                    Db.addSched(Name_input.getText().toString().trim(),
-                        Desc_input.getText().toString().trim(),
-                        Date_input.getText().toString().trim(),
-                        Integer.valueOf(Time_input.getText().toString().trim()),
-                            Integer.valueOf(Color_input.getText().toString().trim()),
-                        String.valueOf(Image_input.getImageAlpha()));
-            }
-        });
-
         imageToUpload = findViewById(R.id.imageToUpload);
 
         bSaveTask = findViewById(R.id.bSaveTask);
@@ -106,6 +87,25 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
         imageToUpload.setOnClickListener(this);
         bSaveTask.setOnClickListener(this);
 
+        databaseHelper = new DatabaseHelper(AddTask.this);
+
+        bSaveTask.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String name = taskName.getText().toString();
+                String description = taskDesc.getText().toString();
+                String date = datepick.getText().toString();
+                String time = timepick.getText().toString();
+                int image = imageToUpload.getImageAlpha();
+
+            if (name.isEmpty() && description.isEmpty() && date.isEmpty() && time.isEmpty())
+                Toast.makeText(AddTask.this, "Please enter all the data", Toast.LENGTH_SHORT).show();
+            return;
+            }
+
+
+        });
+        databaseHelper.addSched();
     }
 
     @Override
@@ -164,15 +164,10 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE);
                 break;
-            case R.id.bSaveTask:
-
-                break;
-
         }
 
 
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
