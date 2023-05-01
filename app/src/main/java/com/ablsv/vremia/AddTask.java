@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormat;
 import java.util.Calendar;
 
@@ -30,13 +34,13 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, View.OnClickListener {
 
 
-    private EditText taskName;
-    private EditText taskDesc;
+    private EditText taskName, taskDesc;
     private TextView datepick, timepick, colorpick, colorprev;
     int DefColor;
     ImageView imageToUpload;
     Button bSaveTask;
     private static final int RESULT_LOAD_IMAGE = 1;
+    private Bitmap selectedImageBitmap;
 
 
     @SuppressLint("CutPasteId")
@@ -113,10 +117,16 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
                 colorpick.setText("");
                 imageToUpload.setImageURI(Uri.parse(""));
 
-
+                gotoHome();
             }
         });
 
+    }
+
+    public void gotoHome()
+    {
+        Intent gotohome = new Intent(AddTask.this, HomeActivity.class);
+        startActivity(gotohome);
     }
 
     @Override
@@ -175,11 +185,38 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE);
                 break;
-            case R.id.addBtn:
+            case R.id.bSaveTask:
+                String name = taskName.getText().toString();
+                String description = taskDesc.getText().toString();
+                String date = datepick.getText().toString();
+                String time = timepick.getText().toString();
+                String color = colorpick.getText().toString();
+
+                if (name.isEmpty() && description.isEmpty() && date.isEmpty() && time.isEmpty() && color.isEmpty()) {
+                    Toast.makeText(AddTask.this, "Please enter all the data", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Drawable imageDrawable = imageToUpload.getDrawable();
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) imageDrawable;
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] imageBytes = stream.toByteArray();
+
+                DatabaseHelper databaseHelper = new DatabaseHelper(AddTask.this);
+                databaseHelper.addSched(taskName, taskDesc, datepick, timepick, colorpick, imageToUpload);
+
+                Toast.makeText(AddTask.this, "Schedule has been added", Toast.LENGTH_SHORT).show();
+                taskName.setText("");
+                taskDesc.setText("");
+                datepick.setText("");
+                timepick.setText("");
+                colorpick.setText("");
+                imageToUpload.setImageURI(Uri.parse(""));
+                gotoHome();
                 break;
         }
-
-
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

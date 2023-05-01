@@ -1,18 +1,23 @@
 package com.ablsv.vremia;
 
+
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
-import java.text.DateFormat;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 
@@ -51,11 +56,30 @@ class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_DATE, date.getText().toString());
         cv.put(COLUMN_TIME, time.getText().toString());
         cv.put(COLUMN_COLOR, color.getText().toString());
-        cv.put(COLUMN_IMAGE, "");
+
+        Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        byte[] imageBytes = outputStream.toByteArray();
+        cv.put(COLUMN_IMAGE, imageBytes);
 
         db.insert(TABLE_NAME, null, cv);
         db.close();
     }
+
+    public Bitmap getImageById(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {COLUMN_IMAGE};
+        String selection = COLUMN_ID + "=?";
+        String[] selectionArgs = {String.valueOf(id)};
+        Cursor cursor = db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            @SuppressLint("Range") byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(COLUMN_IMAGE));
+            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        }
+        return null;
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         String query =
