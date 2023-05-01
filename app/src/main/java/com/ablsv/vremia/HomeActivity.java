@@ -1,5 +1,6 @@
 package com.ablsv.vremia;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -38,7 +39,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
 
 
-        fab = (FloatingActionButton) findViewById(R.id.addBtn);
+        fab = findViewById(R.id.addBtn);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,7 +48,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         });
 
         recyclerView = findViewById(R.id.recyc);
-        fab = findViewById(R.id.addBtn);
 
     }
 
@@ -64,6 +64,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId())

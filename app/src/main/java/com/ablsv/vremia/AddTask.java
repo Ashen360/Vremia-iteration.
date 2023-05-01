@@ -1,4 +1,5 @@
 package com.ablsv.vremia;
+
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -29,8 +30,8 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, View.OnClickListener {
 
 
-    private EditText taskName, taskDesc, taskIcon;
-    private DatabaseHelper databaseHelper;
+    private EditText taskName;
+    private EditText taskDesc;
     private TextView datepick, timepick, colorpick, colorprev;
     int DefColor;
     ImageView imageToUpload;
@@ -43,15 +44,14 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
-
         taskName = findViewById(R.id.taskNameInput);
         taskDesc = findViewById(R.id.descInput);
         colorpick = findViewById(R.id.colorpick);
         datepick = findViewById(R.id.datepick);
         timepick = findViewById(R.id.timepick);
-        taskIcon = findViewById(R.id.imageToUpload);
         DefColor = ContextCompat.getColor(AddTask.this, R.color.white);
         ImageView cancelbtn = findViewById(R.id.cancel);
+        ImageView addbtn = (ImageView) findViewById(R.id.addBtn);
         Button taskBtn = findViewById(R.id.bSaveTask);
 
         colorpick.setOnClickListener(new View.OnClickListener() {
@@ -87,25 +87,36 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
         imageToUpload.setOnClickListener(this);
         bSaveTask.setOnClickListener(this);
 
-        databaseHelper = new DatabaseHelper(AddTask.this);
+        DatabaseHelper databaseHelper = new DatabaseHelper(AddTask.this);
 
-        bSaveTask.setOnClickListener(new View.OnClickListener() {
+        taskBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String name = taskName.getText().toString();
                 String description = taskDesc.getText().toString();
                 String date = datepick.getText().toString();
                 String time = timepick.getText().toString();
+                String color = colorpick.getText().toString();
                 int image = imageToUpload.getImageAlpha();
 
-            if (name.isEmpty() && description.isEmpty() && date.isEmpty() && time.isEmpty())
-                Toast.makeText(AddTask.this, "Please enter all the data", Toast.LENGTH_SHORT).show();
-            return;
+                if (name.isEmpty() && description.isEmpty() && date.isEmpty() && time.isEmpty() && color.isEmpty()) {
+                    Toast.makeText(AddTask.this, "Please enter all the data", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                databaseHelper.addSched(taskName, taskDesc, datepick, timepick, colorpick, imageToUpload);
+                Toast.makeText(AddTask.this, "Schedule has been added", Toast.LENGTH_SHORT).show();
+                taskName.setText("");
+                taskDesc.setText("");
+                datepick.setText("");
+                timepick.setText("");
+                colorpick.setText("");
+                imageToUpload.setImageURI(Uri.parse(""));
+
+
             }
-
-
         });
-        databaseHelper.addSched();
+
     }
 
     @Override
@@ -163,6 +174,8 @@ public class AddTask extends AppCompatActivity implements DatePickerDialog.OnDat
             case R.id.imageToUpload:
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMAGE);
+                break;
+            case R.id.addBtn:
                 break;
         }
 

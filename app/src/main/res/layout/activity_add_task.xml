@@ -68,7 +68,7 @@
                     android:layout_height="40dp"
                     android:autofillHints=""
                     android:hint="@string/enter_task_name"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@android:color/holo_orange_dark"
                     android:textColorHint="@android:color/holo_orange_dark"
                     tools:ignore="TextFields,TouchTargetSizeCheck" />
 
@@ -117,7 +117,7 @@
                     android:scrollbars="vertical"
                     android:scrollHorizontally="false"
                     android:textAlignment="center"
-                    android:textColor="#FFFFFF"
+                    android:textColor="@android:color/holo_orange_dark"
                     android:textColorHint="@android:color/holo_orange_dark"
                     tools:ignore="RtlCompat,RtlSymmetry" />
 
