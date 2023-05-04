@@ -99,5 +99,15 @@ class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+    Cursor readAllData() {
+        String query = "Select * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null) {
+         cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
 }
 

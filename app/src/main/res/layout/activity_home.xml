@@ -7,8 +7,8 @@
 
 
     <include
-        android:id="@+id/recyc"
-        layout="@layout/recycler_activity"
+        android:id="@+id/recycler_view_row"
+        layout="@layout/recycler_view_row"
         android:layout_width="match_parent"
         android:layout_height="672dp"
         app:layout_constraintBottom_toBottomOf="parent"
